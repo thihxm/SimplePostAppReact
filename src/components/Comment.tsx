@@ -1,6 +1,7 @@
 import { format, formatDistanceToNow } from 'date-fns'
 import ptBR from 'date-fns/locale/pt-BR'
 import { ThumbsUp, Trash } from 'phosphor-react'
+import { useState } from 'react'
 
 import { Avatar } from './Avatar'
 import styles from './Comment.module.css'
@@ -23,12 +24,18 @@ export function Comment({
   content,
   onDeleteComment,
 }: CommentProps) {
+  const [likeCount, setLikeCount] = useState(0)
+
   const publishedAtFormatted = format(publishedAt, "d 'de' LLLL 'às' HH:mm'h'", { locale: ptBR })
   
   const publishedAtRealtiveToNow = formatDistanceToNow(publishedAt, { locale: ptBR, addSuffix: true })
 
   const handleDeleteComment = () => {
     onDeleteComment(id)
+  }
+
+  const handleLikeComment = () => {
+    setLikeCount(likeCount + 1)
   }
   
   return (
@@ -52,9 +59,9 @@ export function Comment({
         </div>
 
         <footer>
-          <button>
+          <button onClick={handleLikeComment}>
             <ThumbsUp size={20} />
-            Aplaudir <span>10</span>
+            Aplaudir <span>{likeCount}</span>
           </button>
         </footer>
       </div>
