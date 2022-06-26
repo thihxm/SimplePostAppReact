@@ -1,6 +1,6 @@
 import { format, formatDistanceToNow } from 'date-fns'
 import ptBR from 'date-fns/locale/pt-BR'
-import { ChangeEvent, FormEvent, useState } from 'react'
+import { ChangeEvent, FormEvent, InvalidEvent, useState } from 'react'
 
 import { Avatar } from './Avatar'
 import { Comment } from './Comment'
@@ -56,7 +56,7 @@ export function Post({
         name: 'Thiago Medeiros',
       },
       publishedAt: commentDate,
-      content: newCommentText,
+      content: newCommentText.trim(),
     }
 
     setComments([...comments, newComment])
@@ -65,12 +65,19 @@ export function Post({
   }
 
   const handleNewCommentChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
+    event.target.setCustomValidity('')
     setNewCommentText(event.target.value)
   }
 
   const deleteComment = (id: string) => {
     setComments(comments.filter(comment => comment.id !== id))
   }
+
+  const handleNewInvalidComment = (event: InvalidEvent<HTMLTextAreaElement>) => {
+    event.target.setCustomValidity('Por favor, preencha o campo com seu comentário')
+  }
+
+  const isNewCommentEmpty = newCommentText.trim().length === 0
 
   return (
     <article className={styles.post}>
@@ -119,10 +126,15 @@ export function Post({
           value={newCommentText}
           placeholder='Escreva um comentário...'
           onChange={handleNewCommentChange}
+          onInvalid={handleNewInvalidComment}
+          required
         />
   
         <footer>
-          <button type="submit">Publicar</button>
+          <button
+            type="submit"
+            disabled={isNewCommentEmpty}
+          >Publicar</button>
         </footer>
       </form>
 
