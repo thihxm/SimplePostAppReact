@@ -1,33 +1,74 @@
+import { format, formatDistanceToNow } from 'date-fns'
+import ptBR from 'date-fns/locale/pt-BR'
+
 import { Avatar } from './Avatar'
 import { Comment } from './Comment'
 import styles from './Post.module.css'
 
-export function Post() {
+interface PostProps {
+  author : {
+    avatarUrl: string
+    name: string
+    role: string
+  }
+  publishedAt: Date
+  content: {
+    type: string,
+    content: string,
+  }[],
+  tags?: string[],
+}
+
+export function Post({
+  author,
+  publishedAt,
+  content,
+  tags,
+}: PostProps) {
+  const publishedAtFormatted = format(publishedAt, "d 'de' LLLL 'às' HH:mm'h'", { locale: ptBR })
+  const publishedAtRealtiveToNow = formatDistanceToNow(publishedAt, { locale: ptBR, addSuffix: true })
+
   return (
     <article className={styles.post}>
       <header className={styles.header}>
-        <Avatar src='https://github.com/thihxm.png' />
+        <Avatar src={author.avatarUrl} />
 
         <div className={styles.authorInfo}>
-          <strong>Thiago Medeiros</strong>
-          <span>Web Developer</span>
+          <strong>{author.name}</strong>
+          <span>{author.role}</span>
         </div>
       
-        <time title='25 de julho de 2022 às 22:00h' dateTime='2022-06-25 22:00:00'>Publicado há 1h</time>
+        <time
+          title={publishedAtFormatted}
+          dateTime={publishedAt.toISOString()}
+        >
+          {publishedAtRealtiveToNow}
+        </time>
       </header>
       
       <div className={styles.content}>
-        <p>Fala galeraa 👋</p>
+        {content.map(({ type, content }) => {
+          if (type === 'paragraph') {
+            return <p>{content}</p>
+          }
+
+          if (type === 'link') {
+            return <a href='#'>{content}</a>
+          }
+        })}
         
-        <p>Acabei de subir mais um projeto no meu portifa. É um projeto que fiz no NLW Return, evento da Rocketseat. O nome do projeto é DoctorCare 🚀</p>
-        
-        <p>👉{' '}<a href='#'>jane.design/doctorcare</a></p>
-        
-        <p>
-          <a href='#'>#novoprojeto</a>{' '}
-          <a href='#'>#nlw</a>{' '}
-          <a href='#'>#rocketseat</a>
-        </p>
+        {tags && (
+          <p>
+            {
+              tags.map(tag => (
+                <>
+                  <a key={tag} href={`${tag}`}>{tag}</a>
+                  {' '}
+                </>
+              ))
+            }
+          </p>
+        )}
       </div>
 
       <form className={styles.commentForm}>
