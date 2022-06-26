@@ -35,7 +35,7 @@ export function Comment({
   }
 
   const handleLikeComment = () => {
-    setLikeCount(likeCount + 1)
+    setLikeCount((currLikeCount) => currLikeCount + 1)
   }
   
   return (
