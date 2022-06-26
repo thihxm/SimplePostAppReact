@@ -29,6 +29,10 @@
   filter: brightness(0.8);
 }
 
+.content p a + a {
+  margin-left: 0.25rem;
+}
+
 .header {
   display: flex;
   align-items: center;

@@ -1,5 +1,6 @@
 import { format, formatDistanceToNow } from 'date-fns'
 import ptBR from 'date-fns/locale/pt-BR'
+import { ChangeEvent, FormEvent, useState } from 'react'
 
 import { Avatar } from './Avatar'
 import { Comment } from './Comment'
@@ -19,14 +20,63 @@ interface PostProps {
   tags?: string[],
 }
 
+const comments = [
+  {
+    id: 1,
+    author: {
+      avatarUrl: 'https://github.com/thihxm.png',
+      name: 'Thiago Medeiros',
+    },
+    publishedAt: new Date('2022-06-26T10:32:00'),
+    content: 'Muito bom, parabéns!! 👏👏',
+  }
+]
+
 export function Post({
   author,
   publishedAt,
   content,
   tags,
 }: PostProps) {
+  const [comments, setComments] = useState([
+    {
+      id: 1,
+      author: {
+        avatarUrl: 'https://github.com/thihxm.png',
+        name: 'Thiago Medeiros',
+      },
+      publishedAt: new Date('2022-06-26T10:32:00'),
+      content: 'Muito bom, parabéns!! 👏👏',
+    }
+  ])
+
+  const [newCommentText, setNewCommentText] = useState('')
+  
   const publishedAtFormatted = format(publishedAt, "d 'de' LLLL 'às' HH:mm'h'", { locale: ptBR })
+
   const publishedAtRealtiveToNow = formatDistanceToNow(publishedAt, { locale: ptBR, addSuffix: true })
+
+  const handleCreateNewComment = (event: FormEvent) => {
+    event.preventDefault()
+
+    const newComment = {
+      id: comments.length + 1,
+      author: {
+        avatarUrl: 'https://github.com/thihxm.png',
+        name: 'Thiago Medeiros',
+      },
+      publishedAt: new Date(),
+      content: newCommentText,
+    }
+
+    setComments([...comments, newComment])
+
+    setNewCommentText('')
+  }
+
+  const handleNewCommentChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
+    setNewCommentText(event.target.value)
+  }
 
   return (
     <article className={styles.post}>
@@ -49,11 +99,11 @@ export function Post({
       <div className={styles.content}>
         {content.map(({ type, content }) => {
           if (type === 'paragraph') {
-            return <p>{content}</p>
+            return <p key={content}>{content}</p>
           }
 
           if (type === 'link') {
-            return <a href='#'>{content}</a>
+            return <p key={content}><a href='#'>{content}</a></p>
           }
         })}
         
@@ -61,20 +111,21 @@ export function Post({
           <p>
             {
               tags.map(tag => (
-                <>
-                  <a key={tag} href={`${tag}`}>{tag}</a>
-                  {' '}
-                </>
+                <a key={tag} href={`${tag}`}>{tag}</a>
               ))
             }
           </p>
         )}
       </div>
 
-      <form className={styles.commentForm}>
+      <form onSubmit={handleCreateNewComment} className={styles.commentForm}>
         <strong>Deixe seu feedback</strong>
 
-        <textarea placeholder='Escreva um comentário...' />
+        <textarea
+          value={newCommentText}
+          placeholder='Escreva um comentário...'
+          onChange={handleNewCommentChange}
+        />
   
         <footer>
           <button type="submit">Publicar</button>
@@ -82,9 +133,14 @@ export function Post({
       </form>
 
       <div className={styles.commentList}>
-        <Comment />
-        <Comment />
-        <Comment />
+        {comments.map(comment => (
+          <Comment
+            key={comment.id}
+            author={comment.author}
+            publishedAt={comment.publishedAt}
+            content={comment.content}
+          />
+        ))}
       </div>
     </article>
   )

@@ -1,18 +1,34 @@
+import { format, formatDistanceToNow } from 'date-fns'
+import ptBR from 'date-fns/locale/pt-BR'
 import { ThumbsUp, Trash } from 'phosphor-react'
+
 import { Avatar } from './Avatar'
 import styles from './Comment.module.css'
 
-export function Comment() {
+interface CommentProps {
+  author: {
+    avatarUrl: string
+    name: string
+  }
+  publishedAt: Date
+  content: string
+}
+
+export function Comment({ author, publishedAt, content }: CommentProps) {
+  const publishedAtFormatted = format(publishedAt, "d 'de' LLLL 'às' HH:mm'h'", { locale: ptBR })
+  
+  const publishedAtRealtiveToNow = formatDistanceToNow(publishedAt, { locale: ptBR, addSuffix: true })
+  
   return (
     <div className={styles.comment}>
-      <Avatar hasBorder={false} src="https://github.com/thihxm.png" />
+      <Avatar hasBorder={false} src={author.avatarUrl} />
 
       <div className={styles.commentBox}>
         <div className={styles.commentContent}>
           <header>
             <div className={styles.authorAndTime}>
-              <strong>Thiago Medeiros</strong>
-              <time title='25 de julho de 2022 às 22:00h' dateTime='2022-06-25 22:00:00'>Cerca de 1h atrás</time>
+              <strong>{author.name}</strong>
+              <time title={publishedAtFormatted} dateTime={publishedAt.toISOString()}>{publishedAtRealtiveToNow} </time>
             </div>
 
             <button title='Deletar comentário'>
@@ -20,7 +36,7 @@ export function Comment() {
             </button>
           </header>
 
-          <p>Muito bom Devon, parabéns!! 👏👏</p>
+          <p>{content}</p>
         </div>
 
         <footer>
