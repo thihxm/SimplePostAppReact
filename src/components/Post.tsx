@@ -20,18 +20,6 @@ interface PostProps {
   tags?: string[],
 }
 
-const comments = [
-  {
-    id: 1,
-    author: {
-      avatarUrl: 'https://github.com/thihxm.png',
-      name: 'Thiago Medeiros',
-    },
-    publishedAt: new Date('2022-06-26T10:32:00'),
-    content: 'Muito bom, parabéns!! 👏👏',
-  }
-]
-
 export function Post({
   author,
   publishedAt,
@@ -40,7 +28,7 @@ export function Post({
 }: PostProps) {
   const [comments, setComments] = useState([
     {
-      id: 1,
+      id: '1',
       author: {
         avatarUrl: 'https://github.com/thihxm.png',
         name: 'Thiago Medeiros',
@@ -59,13 +47,15 @@ export function Post({
   const handleCreateNewComment = (event: FormEvent) => {
     event.preventDefault()
 
+    const commentDate = new Date()
+
     const newComment = {
-      id: comments.length + 1,
+      id: `${comments.length + 1}_${commentDate.getTime()}`,
       author: {
         avatarUrl: 'https://github.com/thihxm.png',
         name: 'Thiago Medeiros',
       },
-      publishedAt: new Date(),
+      publishedAt: commentDate,
       content: newCommentText,
     }
 
@@ -76,6 +66,10 @@ export function Post({
 
   const handleNewCommentChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
     setNewCommentText(event.target.value)
+  }
+
+  const deleteComment = (id: string) => {
+    setComments(comments.filter(comment => comment.id !== id))
   }
 
   return (
@@ -136,9 +130,11 @@ export function Post({
         {comments.map(comment => (
           <Comment
             key={comment.id}
+            id={comment.id}
             author={comment.author}
             publishedAt={comment.publishedAt}
             content={comment.content}
+            onDeleteComment={deleteComment}
           />
         ))}
       </div>

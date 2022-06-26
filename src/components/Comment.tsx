@@ -6,18 +6,30 @@ import { Avatar } from './Avatar'
 import styles from './Comment.module.css'
 
 interface CommentProps {
+  id: string
   author: {
     avatarUrl: string
     name: string
   }
   publishedAt: Date
   content: string
+  onDeleteComment: (id: string) => void
 }
 
-export function Comment({ author, publishedAt, content }: CommentProps) {
+export function Comment({
+  id,
+  author,
+  publishedAt,
+  content,
+  onDeleteComment,
+}: CommentProps) {
   const publishedAtFormatted = format(publishedAt, "d 'de' LLLL 'às' HH:mm'h'", { locale: ptBR })
   
   const publishedAtRealtiveToNow = formatDistanceToNow(publishedAt, { locale: ptBR, addSuffix: true })
+
+  const handleDeleteComment = () => {
+    onDeleteComment(id)
+  }
   
   return (
     <div className={styles.comment}>
@@ -31,7 +43,7 @@ export function Comment({ author, publishedAt, content }: CommentProps) {
               <time title={publishedAtFormatted} dateTime={publishedAt.toISOString()}>{publishedAtRealtiveToNow} </time>
             </div>
 
-            <button title='Deletar comentário'>
+            <button onClick={handleDeleteComment} title='Deletar comentário'>
               <Trash size={24} />
             </button>
           </header>
